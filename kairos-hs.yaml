@@ -1,0 +1,51 @@
+#cloud-config
+install:
+  device: "auto"
+  auto: true
+  reboot: true
+
+debug: true
+
+hostname: kairos-k3s-hs
+users:
+- name: kairos
+  groups:
+    - "admin"
+  ssh_authorized_keys:
+    - "github:UnconventionalMindset"
+    - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCoPJQAHkfSRIfS05ptesdKwTX7ererHcTZ7pKWi7yUqOQv1e2xpfNBcfx/trwzITJe9N7bwp7t6gpPY2/yBr8F6TenigFWhDaF3Qi9kdSlv64eOsPv6iTg0URH7RE4RQwdArPuwAEBA79BOVoJ0qG/zgn0LOlqYGE/EameYxtgzDJNjXPWOi6OkPKhOEc00+wWGucsCw/8a6rzaMbQHn647yiS7XUJ9/QgMwZ5tqT+Fw/1dxzV4zrWK5MVEXlN5wRZEzukadPQJKyZhhhx3o7MqEVOsTHvyBln6NVJGFawQY7B+ffN/+9n6pEuskWCqngywqAvDXyRS7zD/Dxqv5pjzSQI2fkyuM21oRcKlSYx2AB4L46J6MRJ4ZLA5dhY0fwv868F5VFmJZ2AsDmaGFCqdXTMCv6VRnghJo75oybv+/eoV53NETrTeB4XsPOxSZOHmK93zJzGw2hT4X/ZTvyVbnCyU+Z4sg2iU8ZVE3pHJi8ZQ3hadW0N+CAAmVQ+zsE= nousername"
+
+k3s:
+  enabled: true
+  args:
+  - --disable=traefik,servicelb
+  - --cluster-init
+  - --node-ip 192.168.31.193
+  # Token will be generated if not specified at /var/lib/rancher/k3s/server/node-token
+  env:
+    K3S_NODE_NAME: "homeserver"
+
+stages:
+  initramfs:
+    - files:
+      - path: /etc/systemd/network/01-man.network
+        permissions: 0644
+        content: |
+          [Match]
+          Name=ens18
+
+          [Network]
+          Address=192.168.31.193/24
+          Gateway=192.168.31.1
+          DNS=1.1.1.1
+#    # "boot" is the stage
+#    boot:
+#      - systemd_firstboot:
+#          keymap: uk
+#      - modules:
+#        - nvidia
+#        authorized_keys:
+#          kairos
+#         - "github:UnconventionalMindset"
+#         - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCoPJQAHkfSRIfS05ptesdKwTX7ererHcTZ7pKWi7yUqOQv1e2xpfNBcfx/trwzITJe9N7bwp7t6gpPY2/yBr8F6TenigFWhDaF3Qi9kdSlv64eOsPv6iTg0URH7RE4RQwdArPuwAEBA79BOVoJ0qG/zgn0LOlqYGE/EameYxtgzDJNjXPWOi6OkPKhOEc00+wWGucsCw/8a6rzaMbQHn647yiS7XUJ9/QgMwZ5tqT+Fw/1dxzV4zrWK5MVEXlN5wRZEzukadPQJKyZhhhx3o7MqEVOsTHvyBln6NVJGFawQY7B+ffN/+9n6pEuskWCqngywqAvDXyRS7zD/Dxqv5pjzSQI2fkyuM21oRcKlSYx2AB4L46J6MRJ4ZLA5dhY0fwv868F5VFmJZ2AsDmaGFCqdXTMCv6VRnghJo75oybv+/eoV53NETrTeB4XsPOxSZOHmK93zJzGw2hT4X/ZTvyVbnCyU+Z4sg2iU8ZVE3pHJi8ZQ3hadW0N+CAAmVQ+zsE= nousername"
+
