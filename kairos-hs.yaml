@@ -1,6 +1,7 @@
 #cloud-config
 install:
-  device: "auto"
+  image: "docker:quay.io/unconventionalmindset/kairos-fedora-transcoding:latest"
+  device: "/dev/vda"
   auto: true
   reboot: true
 
