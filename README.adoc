@@ -1,0 +1,24 @@
+= My Kairos setup
+
+
+== Install
+
+Homeserver node
+[source,bash]
+----
+$ sudo kairos-agent manual-install https://raw.githubusercontent.com/UnconventionalMindset/kairos-setup/master/kairos-hs.yaml
+----
+
+
+Elitedesk 1 node
+[source,bash]
+----
+$ sudo kairos-agent manual-install https://raw.githubusercontent.com/UnconventionalMindset/kairos-setup/master/kairos-e1.yaml
+----
+
+
+Elitedesk 2 node
+[source,bash]
+----
+$ sudo kairos-agent manual-install https://raw.githubusercontent.com/UnconventionalMindset/kairos-setup/master/kairos-e2.yaml
+----
