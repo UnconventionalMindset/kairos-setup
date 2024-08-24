@@ -25,7 +25,7 @@ k3s:
   # Token will be generated if not specified at /var/lib/rancher/k3s/server/node-token
   env:
     K3S_NODE_NAME: "e2"
-    TOKEN: ""
+    K3S_TOKEN: ""
 
 stages:
   initramfs:
