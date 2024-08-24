@@ -7,7 +7,7 @@ install:
 
 debug: true
 
-hostname: kairos-k3s-hs
+hostname: kairos-fed-k3s-e1
 users:
 - name: kairos
   groups:
@@ -24,7 +24,7 @@ k3s:
   - --node-ip 192.168.31.191
   # Token will be generated if not specified at /var/lib/rancher/k3s/server/node-token
   env:
-    K3S_NODE_NAME: "homeserver"
+    K3S_NODE_NAME: "e1"
 
 stages:
   initramfs:
