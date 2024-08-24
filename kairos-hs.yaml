@@ -1,13 +1,13 @@
 #cloud-config
 install:
-  image: "docker:quay.io/unconventionalmindset/kairos-fedora-transcoding:latest"
+  image: "docker:quay.io/unconventionalmindset/kairos-fedora-transcoding:1.0-cni"
   device: "/dev/vda"
   auto: true
   reboot: true
 
 debug: true
 
-hostname: kairos-k3s-hs
+hostname: kairos-fed-k3s-hs
 users:
 - name: kairos
   groups:
@@ -24,7 +24,7 @@ k3s:
   - --node-ip 192.168.31.193
   # Token will be generated if not specified at /var/lib/rancher/k3s/server/node-token
   env:
-    K3S_NODE_NAME: "homeserver"
+    K3S_NODE_NAME: "hs"
 
 stages:
   initramfs:
