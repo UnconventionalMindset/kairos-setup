@@ -27,18 +27,29 @@ k3s:
     K3S_NODE_NAME: "hs"
 
 stages:
-  initramfs:
-    - files:
-      - path: /etc/systemd/network/01-man.network
-        permissions: 0644
-        content: |
-          [Match]
-          Name=ens18
+    initramfs:
+        - files:
+            - content: |
+                [connection]
+                id=wired-fixed-ip
+                type=802-3-ethernet
+                autoconnect=true
+                interface-name=ens18
+                autoconnect-priority=10
 
-          [Network]
-          Address=192.168.31.193/24
-          Gateway=192.168.31.1
-          DNS=1.1.1.1
+                [ethernet]
+
+                [ipv4]
+                method=manual
+                addresses=192.168.31.193/24
+                gateway=192.168.31.1
+                dns=1.1.1.1;8.8.8.8
+                dns-search=
+              path: /etc/NetworkManager/system-connections/static-ethernet.nmconnection
+              permissions: 0600
+              owner: 0
+              group: 0
+
 #    # "boot" is the stage
 #    boot:
 #      - systemd_firstboot:
