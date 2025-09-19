@@ -3,6 +3,10 @@
 
 == Install
 
+. Install first kairos normally
+. Upgrade the Homeserver node to the custom image
+. Upgrade the other nodes to the custom image changing the token in the config
+
 Homeserver node
 [source,bash]
 ----
