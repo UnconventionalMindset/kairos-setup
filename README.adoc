@@ -17,7 +17,7 @@ Elitedesk 1 node
 curl https://raw.githubusercontent.com/UnconventionalMindset/kairos-setup/master/kairos-e2.yaml > kairos-e1.yaml
 # Copy the token from the homeserver node
 vi kairos-e1.yaml
-sudo kairos-agent manual-install kairos-e2.yaml
+sudo kairos-agent manual-install kairos-e1.yaml
 ----
 
 
