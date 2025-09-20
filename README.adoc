@@ -3,16 +3,11 @@
 
 == Install
 
-. Install first kairos normally using the provided commands
-. Upgrade the Homeserver node to the custom image
-. Upgrade the other nodes to the custom image changing the token in the config
-
 Homeserver node
+
 [source,bash]
 ----
 sudo kairos-agent manual-install https://raw.githubusercontent.com/UnconventionalMindset/kairos-setup/master/kairos-hs.yaml
-# Reboot
-sudo kairos-agent upgrade --source oci:quay.io/unconventionalmindset/kairos-fedora-transcoding:2.0.2-kairos-3.5.2-k3s-1.33.4
 ----
 
 
@@ -23,8 +18,6 @@ curl https://raw.githubusercontent.com/UnconventionalMindset/kairos-setup/master
 # Copy the token from the homeserver node
 vi kairos-e1.yaml
 sudo kairos-agent manual-install kairos-e2.yaml
-# Reboot
-sudo kairos-agent upgrade --source oci:quay.io/unconventionalmindset/kairos-fedora-transcoding:2.0.2-kairos-3.5.2-k3s-1.33.4
 ----
 
 
@@ -35,6 +28,4 @@ curl https://raw.githubusercontent.com/UnconventionalMindset/kairos-setup/master
 # Copy the token from the homeserver node
 vi kairos-e2.yaml
 sudo kairos-agent manual-install kairos-e2.yaml
-# Reboot
-sudo kairos-agent upgrade --source oci:quay.io/unconventionalmindset/kairos-fedora-transcoding:2.0.2-kairos-3.5.2-k3s-1.33.4
 ----
