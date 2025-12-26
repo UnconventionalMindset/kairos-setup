@@ -48,3 +48,10 @@ stages:
             Address=192.168.31.192/24
             Gateway=192.168.31.1
             DNS=1.1.1.1
+
+        - content: |
+            [Journal]
+            SystemMaxUse=500M
+            path: /etc/systemd/journald.conf.d/00-kairos.conf
+          permissions: 0644
+
