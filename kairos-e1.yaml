@@ -1,8 +1,8 @@
 #cloud-config
-# Kairos install config for node e1. See README.adoc.
-# Before installing: replace REPLACE_WITH_TOKEN_FROM_HS below with the token from hs
-# (sudo cat /var/lib/rancher/k3s/server/node-token on hs). Do this on the node,
-# on a local copy. Never commit the real token to this public repo.
+# Kairos install config for node e1, the first (cluster-init) server. See README.adoc.
+# The k3s token is generated on first boot. After install read it with:
+#   sudo cat /var/lib/rancher/k3s/server/node-token
+# and paste it into kairos-hs.yaml and kairos-e2.yaml before installing those.
 
 debug: true
 hostname: kairos-fed-k3s-e1
@@ -45,10 +45,9 @@ k3s:
   args:
     - --disable=traefik,servicelb
     - --node-ip 192.168.31.191
-    - --server https://192.168.31.193:6443
+    - --cluster-init
   env:
     K3S_NODE_NAME: "e1"
-    K3S_TOKEN: "REPLACE_WITH_TOKEN_FROM_HS"
 
 stages:
   boot:

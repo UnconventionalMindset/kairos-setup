@@ -4,29 +4,32 @@ Install configs for the three K3s nodes. They install the image
 `quay.io/unconventionalmindset/kairos-fedora-transcoding:4.4.4-fedora43-k3s-1.35.10`
 (Fedora 43, K3s v1.35.10, Intel GPU transcoding stack) and authorize the `~/.ssh/kairos` Ed25519 key for the `kairos` user.
 
+`e1` is the first (cluster-init) server. `e2` and `hs` join the cluster through it (`https://192.168.31.191:6443`).
+
 These files are in a *public* repo, so they must never contain the k3s token.
-`hs` generates the token on first boot. The other two nodes get a placeholder
-(`REPLACE_WITH_TOKEN_FROM_HS`) that you replace on the node before installing.
+`e1` generates the token on first boot. The other two nodes get a placeholder
+(`REPLACE_WITH_TOKEN_FROM_E1`) that you replace on the node before installing.
 
 Boot the node from the installer ISO, open a shell on it, then run the commands below.
 The disk is `/dev/vda`. The install erases it.
 
 == Install
 
-Install `hs` first. The other two nodes join through it (`https://192.168.31.193:6443`).
+Install `e1` first, then `e2`, then `hs`. The node name (`e1`, `e2`, `hs`) is set in each config; keep it,
+because some workloads are pinned to a node name (Jellyfin runs on `hs`).
 
-=== Homeserver node (hs, 192.168.31.193)
+=== Elitedesk 1 node (e1, 192.168.31.191): first server
 
 [source,bash]
 ----
-sudo kairos-agent manual-install https://raw.githubusercontent.com/UnconventionalMindset/kairos-setup/master/kairos-hs.yaml
+sudo kairos-agent manual-install https://raw.githubusercontent.com/UnconventionalMindset/kairos-setup/master/kairos-e1.yaml
 ----
 
 After it reboots into the installed system, read the token and keep it out of git:
 
 [source,bash]
 ----
-ssh -i ~/.ssh/kairos kairos@192.168.31.193 'sudo cat /var/lib/rancher/k3s/server/node-token'
+ssh -i ~/.ssh/kairos kairos@192.168.31.191 'sudo cat /var/lib/rancher/k3s/server/node-token'
 ----
 
 === Elitedesk 2 node (e2, 192.168.31.192)
@@ -34,19 +37,19 @@ ssh -i ~/.ssh/kairos kairos@192.168.31.193 'sudo cat /var/lib/rancher/k3s/server
 [source,bash]
 ----
 curl -fsSL https://raw.githubusercontent.com/UnconventionalMindset/kairos-setup/master/kairos-e2.yaml > kairos-e2.yaml
-# Replace REPLACE_WITH_TOKEN_FROM_HS with the token from the homeserver node
+# Replace REPLACE_WITH_TOKEN_FROM_E1 with the token from the e1 node
 vi kairos-e2.yaml
 sudo kairos-agent manual-install kairos-e2.yaml
 ----
 
-=== Elitedesk 1 node (e1, 192.168.31.191)
+=== Homeserver node (hs, 192.168.31.193)
 
 [source,bash]
 ----
-curl -fsSL https://raw.githubusercontent.com/UnconventionalMindset/kairos-setup/master/kairos-e1.yaml > kairos-e1.yaml
-# Replace REPLACE_WITH_TOKEN_FROM_HS with the token from the homeserver node
-vi kairos-e1.yaml
-sudo kairos-agent manual-install kairos-e1.yaml
+curl -fsSL https://raw.githubusercontent.com/UnconventionalMindset/kairos-setup/master/kairos-hs.yaml > kairos-hs.yaml
+# Replace REPLACE_WITH_TOKEN_FROM_E1 with the token from the e1 node
+vi kairos-hs.yaml
+sudo kairos-agent manual-install kairos-hs.yaml
 ----
 
 == Disk layout
