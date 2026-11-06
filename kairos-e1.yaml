@@ -1,20 +1,44 @@
 #cloud-config
-install:
-  source: "docker:quay.io/unconventionalmindset/kairos-fedora-transcoding:latest"
-  device: "/dev/vda"
-  auto: true
-  reboot: true
+# Kairos install config for node e1. See README.adoc.
+# Before installing: replace REPLACE_WITH_TOKEN_FROM_HS below with the token from hs
+# (sudo cat /var/lib/rancher/k3s/server/node-token on hs). Do this on the node,
+# on a local copy. Never commit the real token to this public repo.
 
 debug: true
-
 hostname: kairos-fed-k3s-e1
+
+install:
+  auto: true
+  device: /dev/vda
+  reboot: true
+  poweroff: false
+  # Sizes in MiB. state holds active + passive + one temporary image during an upgrade;
+  # recovery holds the recovery image twice for an in-place recovery upgrade; persistent takes the rest.
+  partitions:
+    oem:
+      size: 64
+    state:
+      size: 32768
+    recovery:
+      size: 9216
+    persistent:
+      size: 0        # 0 = take all remaining space
+  system:
+    size: 5120
+  passive:
+    size: 5120
+  recovery-system:
+    size: 4096
+  # Pinned to the published tag so installing from the wrong ISO can never pull the old
+  # ...:latest image (that tag still points at Kairos 3.5.3 / Fedora 40).
+  source: "docker:quay.io/unconventionalmindset/kairos-fedora-transcoding:4.4.4-fedora43-k3s-1.35.10"
+
 users:
   - name: kairos
     groups:
-      - "admin"
+      - admin
     ssh_authorized_keys:
-      - "github:UnconventionalMindset"
-      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCoPJQAHkfSRIfS05ptesdKwTX7ererHcTZ7pKWi7yUqOQv1e2xpfNBcfx/trwzITJe9N7bwp7t6gpPY2/yBr8F6TenigFWhDaF3Qi9kdSlv64eOsPv6iTg0URH7RE4RQwdArPuwAEBA79BOVoJ0qG/zgn0LOlqYGE/EameYxtgzDJNjXPWOi6OkPKhOEc00+wWGucsCw/8a6rzaMbQHn647yiS7XUJ9/QgMwZ5tqT+Fw/1dxzV4zrWK5MVEXlN5wRZEzukadPQJKyZhhhx3o7MqEVOsTHvyBln6NVJGFawQY7B+ffN/+9n6pEuskWCqngywqAvDXyRS7zD/Dxqv5pjzSQI2fkyuM21oRcKlSYx2AB4L46J6MRJ4ZLA5dhY0fwv868F5VFmJZ2AsDmaGFCqdXTMCv6VRnghJo75oybv+/eoV53NETrTeB4XsPOxSZOHmK93zJzGw2hT4X/ZTvyVbnCyU+Z4sg2iU8ZVE3pHJi8ZQ3hadW0N+CAAmVQ+zsE= nousername"
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILB9VK4DY3oaRiObc6pbyXAsJ/fE4qFDDrSWxnw8tSSi 11658632+UnconventionalMindset@users.noreply.github.com"
 
 k3s:
   enabled: true
@@ -22,18 +46,17 @@ k3s:
     - --disable=traefik,servicelb
     - --node-ip 192.168.31.191
     - --server https://192.168.31.193:6443
-  # Token will be generated if not specified at /var/lib/rancher/k3s/server/node-token
   env:
     K3S_NODE_NAME: "e1"
-    K3S_TOKEN: "<CHANGEME>"
+    K3S_TOKEN: "REPLACE_WITH_TOKEN_FROM_HS"
 
 stages:
   boot:
     - systemctl:
-        enable:
-          - iscsid
         disable:
           - firewalld
+        enable:
+          - iscsid
   initramfs:
     - files:
         - path: /etc/systemd/network/01-man.network
@@ -42,15 +65,15 @@ stages:
           group: 0
           content: |
             [Match]
-            Name=ens18
+            Name=en*
 
             [Network]
             Address=192.168.31.191/24
             Gateway=192.168.31.1
             DNS=1.1.1.1
-
-        - content: |
+            DNS=8.8.8.8
+        - path: /etc/systemd/journald.conf.d/00-kairos.conf
+          permissions: 0644
+          content: |
             [Journal]
             SystemMaxUse=500M
-            path: /etc/systemd/journald.conf.d/00-kairos.conf
-          permissions: 0644
